@@ -14,6 +14,13 @@ export class Playground {
 
         this.allMagicClasses = ['magic-normal', 'magic-bubble', 'magic-fire', 'magic-nature', 'magic-thunder'];
 
+        // 🛠️ 滑動/拖曳狀態追蹤變數
+        this.isDragging = false;
+        this.startX = 0;
+        this.startY = 0;
+        this.dragX = 0;
+        this.dragY = 0;
+
         this.sounds = {};
         try {
             this.sounds.normal = new Audio('assets/audio/meow.mp3');
@@ -39,42 +46,91 @@ export class Playground {
 
         this.stateManager.subscribe((state) => this.updateUI(state));
 
-        // 🎯【核心旋轉修復】：讓所有模式全面釋放「3D 旋轉傾斜特效」
+        // ========================================================
+        // 🌌 1. 視覺懸浮移動 + 滑動動態效應
+        // ========================================================
         this.catContainer.addEventListener('mousemove', (e) => {
             const state = this.stateManager.getState();
             
-            // 計算滑鼠相對於中央大圖容器的中心點偏移量
+            // 計算滑鼠相對於容器中心點的偏移
             const rect = this.catContainer.getBoundingClientRect();
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
 
-            // 🌟 迎回旋轉靈魂：不論什麼模式，通通注入流暢的 3D 旋轉矩陣與微幅放大
-            // 通過 X 與 Y 軸的交叉變換，滑鼠移到哪，圖片就立體傾斜到哪！
-            this.catImg.style.transform = `scale(1.03) translate(${x * 0.15}px, ${y * 0.15}px) rotateX(${-y * 0.12}deg) rotateY(${x * 0.12}deg)`;
+            // 如果同時在拖曳滑動，疊加滑動位移
+            const finalX = x * 0.15 + this.dragX;
+            const finalY = y * 0.15 + this.dragY;
 
-            // 滑鼠移動時，根據當前模式源源不絕地從滑鼠尖端噴發對應微光粒子
-            if (Math.random() < 0.3) {
-                if (state.currentMode === 'fire') {
-                    this.particleSystem.emit(e.clientX, e.clientY, 'fire', 1);
-                } else if (state.currentMode === 'bubble') {
-                    this.particleSystem.emit(e.clientX, e.clientY, 'bubble', 1);
-                } else if (state.currentMode === 'nature') {
-                    this.particleSystem.emit(e.clientX, e.clientY, 'nature', 1);
-                } else if (state.currentMode === 'thunder') {
-                    this.particleSystem.emit(e.clientX, e.clientY, 'thunder', 1);
-                } else {
-                    this.particleSystem.emit(e.clientX, e.clientY, 'ambient', 1);
-                }
+            this.catImg.style.transform = `scale(1.03) translate(${finalX}px, ${finalY}px) rotateX(${-finalY * 0.12}deg) rotateY(${finalX * 0.12}deg)`;
+
+            // 邊滑動邊噴發環境粒子
+            if (Math.random() < 0.25) {
+                this.emitModeParticle(state.currentMode, e.clientX, e.clientY, 1);
             }
         });
 
-        // ✨ 滑鼠離開容器時，流暢回彈復原至完美正圓中心
-        this.catContainer.addEventListener('mouseleave', () => {
+        // ========================================================
+        // 👆 2. 圖片滑動/拖曳操控機制 (支援滑鼠與手機觸控)
+        // ========================================================
+        const startDrag = (clientX, clientY) => {
+            this.isDragging = true;
+            this.startX = clientX - this.dragX;
+            this.startY = clientY - this.dragY;
+            this.catImg.style.transition = 'none'; // 拖曳時關閉過渡，確保絕對跟手
+        };
+
+        const doDrag = (clientX, clientY) => {
+            if (!this.isDragging) return;
+            // 計算滑動產生的位移量
+            this.dragX = clientX - this.startX;
+            this.dragY = clientY - this.startY;
+
+            // 限制最大滑動範圍，防止圖片飛出螢幕外（鎖定最大半徑 60px）
+            const distance = Math.sqrt(this.dragX * this.dragX + this.dragY * this.dragY);
+            if (distance > 60) {
+                const angle = Math.atan2(this.dragY, this.dragX);
+                this.dragX = Math.cos(angle) * 60;
+                this.dragY = Math.sin(angle) * 60;
+            }
+
+            this.catImg.style.transform = `scale(1.05) translate(${this.dragX}px, ${this.dragY}px) rotateX(${-this.dragY * 0.3}deg) rotateY(${this.dragX * 0.3}deg)`;
+        };
+
+        const stopDrag = () => {
+            if (!this.isDragging) return;
+            this.isDragging = false;
+            this.dragX = 0;
+            this.dragY = 0;
+            // 放開後恢復平滑的果凍回彈動畫
+            this.catImg.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             this.catImg.style.transform = 'scale(1) translate(0, 0) rotateX(0deg) rotateY(0deg)';
+        };
+
+        // 滑鼠監聽
+        this.catImg.addEventListener('mousedown', (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY); });
+        window.addEventListener('mousemove', (e) => doDrag(e.clientX, e.clientY));
+        window.addEventListener('mouseup', stopDrag);
+
+        // 手機觸控監聽
+        this.catImg.addEventListener('touchstart', (e) => { startDrag(e.touches[0].clientX, e.touches[0].clientY); });
+        window.addEventListener('touchmove', (e) => doDrag(e.touches[0].clientX, e.touches[0].clientY));
+        window.addEventListener('touchend', stopDrag);
+
+        // 滑鼠離開容器時的防呆還原
+        this.catContainer.addEventListener('mouseleave', () => {
+            if (!this.isDragging) {
+                this.catImg.style.transition = 'transform 0.4s ease';
+                this.catImg.style.transform = 'scale(1) translate(0, 0) rotateX(0deg) rotateY(0deg)';
+            }
         });
 
-        // 點擊中間大圖事件
+        // ========================================================
+        // 🖱️ 3. 點擊計數與特效噴發
+        // ========================================================
         this.catImg.addEventListener('click', (e) => {
+            // 如果剛剛發生了較大範圍的滑動，則判定為拖曳而非單純點擊
+            if (Math.abs(this.dragX) > 5 || Math.abs(this.dragY) > 5) return;
+
             const state = this.stateManager.getState();
             
             const currentClicks = state.stats.totalClicks + 1;
@@ -82,24 +138,14 @@ export class Playground {
                 stats: { ...state.stats, totalClicks: currentClicks }
             });
 
+            // 🎵 觸發優化後的聲音控制
             this.playModeSound(state.currentMode);
 
-            const clickX = e.clientX;
-            const clickY = e.clientY;
-
-            if (state.currentMode === 'fire') {
-                this.particleSystem.emit(clickX, clickY, 'fire', 8);
-            } else if (state.currentMode === 'bubble') {
-                this.particleSystem.emit(clickX, clickY, 'bubble', 6);
-            } else if (state.currentMode === 'nature') {
-                this.particleSystem.emit(clickX, clickY, 'nature', 6);
-            } else if (state.currentMode === 'thunder') {
-                this.particleSystem.emit(clickX, clickY, 'thunder', 5);
-            } else {
-                this.particleSystem.emit(clickX, clickY, 'ambient', 5);
-            }
+            // 爆發大量點擊粒子
+            this.emitModeParticle(state.currentMode, e.clientX, e.clientY, 6);
         });
 
+        // 圖片上傳與重置按鈕邏輯
         if (this.btnUpload && this.imageUploader) {
             this.btnUpload.addEventListener('click', () => this.imageUploader.click());
             this.imageUploader.addEventListener('change', (e) => this.handleImageUpload(e));
@@ -116,14 +162,38 @@ export class Playground {
         }
     }
 
+    /**
+     * 🎵【聲音優化核心】：播完才能撥下一次（不打斷防刷機制）
+     */
     playModeSound(mode) {
         try {
             const sound = this.sounds[mode] || this.sounds.normal;
             if (sound) {
+                // 🎯 核心檢查：如果目前的聲音還在前一次的播放中，就直接 return 讓它完整播完
+                if (!sound.paused && sound.currentTime > 0) {
+                    return; 
+                }
                 sound.currentTime = 0;
                 sound.play().catch(() => {});
             }
         } catch(e) {}
+    }
+
+    /**
+     * 🔮 粒子發射輔助器
+     */
+    emitModeParticle(mode, x, y, count) {
+        if (mode === 'fire') {
+            this.particleSystem.emit(x, y, 'fire', count);
+        } else if (mode === 'bubble') {
+            this.particleSystem.emit(x, y, 'bubble', count);
+        } else if (mode === 'nature') {
+            this.particleSystem.emit(x, y, 'nature', count);
+        } else if (mode === 'thunder') {
+            this.particleSystem.emit(x, y, 'thunder', count);
+        } else {
+            this.particleSystem.emit(x, y, 'ambient', count);
+        }
     }
 
     handleImageUpload(e) {
