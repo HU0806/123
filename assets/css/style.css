@@ -1,0 +1,479 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+
+/* ======================================================== */
+/* 🎨 1. 全域變數與基礎重設（微光霓虹暗黑風格）                 */
+/* ======================================================== */
+:root {
+    --bg: #0a001f;
+    --bg-alt: #1a0033;
+    --surface: #14052e;
+    --surface-card: rgba(255, 255, 255, 0.04);
+    --accent-1: #ff6bff;   /* 魔法粉紫 */
+    --accent-2: #7cfcff;   /* 科技青藍 */
+    --accent-3: #ffe066;   /* 驚艷暖黃 */
+    --text-primary: #f0f0ff;
+    --text-muted: #b8a0ff;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --sans-serif: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--sans-serif);
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* 🌌 頂級現代感：玻璃擬態外框基底 */
+.glass {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* 📦 核心版面外殼 */
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* ======================================================== */
+/* 👑 2. Hero 頂部大標題區塊（修復並強化炫彩光球）             */
+/* ======================================================== */
+.hero {
+    padding: 4.5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 3.5rem;
+    border-radius: 28px;
+}
+
+/* 雙向相容：同時支援 class 與 id 的背景隨機光球容器 */
+.hero-shapes, #hero-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    -webkit-filter: blur(90px);
+    opacity: 0.18;
+    animation: floatShape 18s infinite alternate ease-in-out;
+}
+
+@keyframes floatShape {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 40px) scale(1.25); }
+}
+
+.hero-title, .hero h1 {
+    font-size: 3.8rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, #ffffff 0%, var(--text-muted) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    z-index: 2;
+    letter-spacing: -1px;
+}
+
+.hero-description, .hero p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    max-width: 750px;
+    margin: 0 auto;
+    line-height: 1.8;
+    position: relative;
+    z-index: 2;
+    font-weight: 400;
+}
+
+/* ======================================================== */
+/* 🎛️ 3. 模式卡片排列格線系統（完美適應電腦端與手機端）          */
+/* ======================================================== */
+.section-subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    margin-bottom: 2.2rem;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+}
+
+.experiments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+    width: 100%;
+}
+
+.experiment-card {
+    background: var(--surface-card);
+    padding: 1.1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+}
+
+.experiment-card:hover {
+    transform: translateY(-6px);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* 縮圖防破版等比裁剪（電腦版高度鎖定） */
+.card-image, .experiment-card img {
+    width: 100%;
+    height: 135px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.experiment-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.experiment-card p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    /* 限制段落最多顯示兩行，防止文字溢出破壞平衡 */
+    display: -webkit-box;
+    display: box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 🌟 上方卡片選中時的五大屬性霓虹外框外加樣式 */
+.experiment-card.active-normal   { border-color: #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+.experiment-card.active-bubble   { border-color: #06b6d4; box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+.experiment-card.active-fire     { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+.experiment-card.active-nature   { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
+.experiment-card.active-thunder  { border-color: #eab308; box-shadow: 0 0 20px rgba(234, 179, 8, 0.4); }
+
+/* ======================================================== */
+/* 🖥️ 4. 主實驗展示台與中央魔法召喚陣                         */
+/* ======================================================== */
+.main-experiment {
+    background: rgba(12, 4, 35, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 36px;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    box-shadow: inset 0 0 50px rgba(138, 43, 226, 0.08);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+.main-experiment h3 {
+    font-size: 1.5rem;
+    margin-bottom: 2.5rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* 🔮 中央大圖容器與魔法召喚陣機制 */
+.cat-container, #main-cat {
+    width: 330px;
+    height: 330px;
+    margin: 0 auto 3rem;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 魔法陣共同基底外圈線條 */
+.cat-container::before, #main-cat::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.18);
+    animation: rotateAura 30s infinite linear;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+@keyframes rotateAura {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ⚡ 五大屬性底層魔法陣光環切換 */
+.cat-container.magic-normal::before, #main-cat.magic-normal::before   { border-color: rgba(168, 85, 247, 0.6); box-shadow: 0 0 40px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(168, 85, 247, 0.2); }
+.cat-container.magic-bubble::before, #main-cat.magic-bubble::before   { border-color: rgba(6, 182, 212, 0.6); box-shadow: 0 0 40px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(6, 182, 212, 0.2); }
+.cat-container.magic-fire::before, #main-cat.magic-fire::before       { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 0 40px rgba(239, 68, 68, 0.4), inset 0 0 20px rgba(239, 68, 68, 0.2); }
+.cat-container.magic-nature::before, #main-cat.magic-nature::before   { border-color: rgba(34, 197, 94, 0.7); box-shadow: 0 0 45px rgba(34, 197, 94, 0.5), inset 0 0 25px rgba(34, 197, 94, 0.3); }
+.cat-container.magic-thunder::before, #main-cat.magic-thunder::before { border-color: rgba(234, 179, 8, 0.8); box-shadow: 0 0 55px rgba(234, 179, 8, 0.6), inset 0 0 30px rgba(234, 179, 8, 0.4); }
+
+.main-cat-img {
+    width: 84%;
+    height: 84%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    z-index: 2;
+    cursor: pointer;
+    transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease;
+}
+
+.main-cat-img:hover {
+    transform: scale(1.03);
+}
+
+/* 控制功能按鈕區塊 */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.button {
+    padding: 0.85rem 2.2rem;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-family: var(--sans-serif);
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 由於原本 HTML 把顏色寫在行內，這邊提供 hover 增強亮度的全域相容 */
+.button:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    filter: brightness(1.2);
+}
+
+.button:active {
+    transform: scale(0.97) translateY(0);
+}
+
+/* ======================================================== */
+/* ⏳ 5. 頁面全螢幕載入蓋板（兼容舊版與新版所有類名，修復特效） */
+/* ======================================================== */
+.page-loader, .loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #050012;
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.loader-content {
+    text-align: center;
+    width: 280px;
+}
+
+.loader-spinner {
+    width: 45px;
+    height: 45px;
+    border: 3px solid rgba(124, 252, 255, 0.1);
+    border-top: 3px solid var(--accent-2);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    animation: spin 0.8s infinite linear;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loader-text, .loader-title {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin-bottom: 1.2rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.loader-bar-bg, .loader-progress-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.loader-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    transition: width 0.1s ease;
+}
+
+/* ======================================================== */
+/* ⚡ 6. 附加功能：閃電全螢幕震動效果                           */
+/* ======================================================== */
+.magic-screen-shake {
+    animation: screenShake 0.2s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes screenShake {
+    10%, 90% { transform: translate3d(-2px, 1px, 0) rotate(0.5deg); }
+    20%, 80% { transform: translate3d(3px, -2px, 0) rotate(-0.5deg); }
+    30%, 50%, 70% { transform: translate3d(-5px, 3px, 0) rotate(1deg); }
+    40%, 60% { transform: translate3d(5px, -1px, 0) rotate(-1deg); }
+}
+
+/* ======================================================== */
+/* 📱 7. RWD 行動裝置極致相容性優化（完美修復卡片壓扁、破版）   */
+/* ======================================================== */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1.2rem 0.8rem;
+    }
+
+    .hero {
+        padding: 2.2rem 1rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .hero-title, .hero h1 {
+        font-size: 2.1rem !important;
+        letter-spacing: 0px;
+        line-height: 1.3;
+    }
+
+    .hero-description, .hero p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .section-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* 💡 核心修正：2排並列時，限制卡片內部空間，徹底防止被壓扁 */
+    .experiments-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+        margin-bottom: 2rem;
+    }
+
+    .experiment-card {
+        padding: 0.65rem;
+        border-radius: 14px;
+    }
+
+    /* 💡 將卡片高度從 130px 下修，配合手機版雙排寬度，回歸黃金矩形比例 */
+    .card-image, .experiment-card img {
+        height: 80px;
+        margin-bottom: 0.5rem;
+        border-radius: 10px;
+    }
+
+    .experiment-card h4 {
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 0.2rem;
+    }
+
+    /* 💡 在手機端隱藏超長描述文字，避免卡片變成長度不一的墓碑狀，排版更乾淨 */
+    .experiment-card p {
+        display: none !important;
+    }
+
+    /* 🎯 中央主要實驗台手機版縮小 */
+    .main-experiment {
+        padding: 2rem 1rem;
+        border-radius: 28px;
+    }
+
+    .main-experiment h3 {
+        font-size: 1.1rem;
+        margin-bottom: 1.8rem;
+    }
+
+    /* 🎯 限制中央圓形大圖在手機板的寬高，防止溢出貼邊 */
+    .cat-container, #main-cat {
+        width: 240px;
+        height: 240px;
+        margin: 0 auto 2rem;
+    }
+
+    .main-cat-img {
+        width: 85%;
+        height: 85%;
+        border-width: 3px;
+    }
+
+    /* 按鈕控制列優化 */
+    .controls {
+        gap: 0.8rem;
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+
+    .button {
+        padding: 0.65rem 1rem;
+        font-size: 0.88rem;
+        border-radius: 10px;
+        flex: 1; /* 讓兩個按鈕等寬平分空間 */
+        text-align: center;
+    }
+}
+
+/* 針對極窄智慧手機（如 iPhone SE）做舒適微調 */
+@media (max-width: 360px) {
+    .cat-container, #main-cat {
+        width: 200px;
+        height: 200px;
+    }
+    .hero-title, .hero h1 {
+        font-size: 1.8rem !important;
+    }
+}

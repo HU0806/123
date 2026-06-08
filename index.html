@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>程式動畫課程</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 🎨 高效能 Canvas 粒子畫布，覆蓋在最上層但滑鼠可以穿透點擊 */
+        #effects-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* 📊 數據面板：讓它美觀地融入原本的設計中 */
+        .stats-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            margin: 2rem auto;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #b8a0ff;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #7cfcff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-loader" id="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">載入中... <span id="loader-percent">0%</span></div>
+            <div class="loader-bar-bg">
+                <div class="loader-bar" id="loader-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="effects-canvas"></canvas>
+
+    <div class="app-container">
+        <section class="hero glass">
+            <div class="hero-shapes" id="hero-shapes"></div>
+            <h1 class="hero-title">視覺特效互動平台</h1>
+            <p class="hero-description"></p>
+            <button class="button" id="btn-enter" style="background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #0a001f; font-weight: bold; border: none; box-shadow: 0 4px 15px rgba(255,107,255,0.4);">進入➔</button>
+        </section>
+
+        <section class="section" id="playground">
+            <p class="section-subtitle">點擊下方卡片，體驗不同互動效果</p>
+
+            <div class="experiments-grid" id="experiments-grid"></div>
+
+            <div class="main-experiment">
+                <h3>目前特效模式：<span id="stat-mode" style="color: var(--accent-2);">預設</span></h3>
+
+                <div class="cat-container" id="main-cat">
+                    <img src="8b374a4f-90c3-46eb-843d-6b4aa15c9706.jpg" alt="主題" class="main-cat-img" id="main-cat-img">
+                </div>
+
+                <div class="controls">
+                    <input type="file" id="image-uploader" accept="image/*" style="display: none;">
+                    <button class="button" id="btn-upload" style="background: var(--surface); color: white; border: 1px solid rgba(255,255,255,0.15);">上傳圖片 📂</button>
+                    <button class="button" id="btn-reset" style="background: rgba(255, 75, 75, 0.2); color: #ff7676; border: 1px solid rgba(255, 75, 75, 0.4);">重置圖片 🔄</button>
+                </div>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stat-item">
+                    <div class="stat-label">互動點擊次數</div>
+                    <div class="stat-value" id="stat-clicks">0 次</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="src/core/App.js"></script>
+</body>
+
+</html>
